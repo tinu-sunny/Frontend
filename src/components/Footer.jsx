@@ -15,7 +15,7 @@ export const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative bg-[#020617] border-t border-cyan-500/20 pt-16 pb-12 px-4 sm:px-6 lg:px-8 z-10 text-left overflow-hidden">
+    <footer id="footer" className="relative bg-[#020617] border-t border-cyan-500/20 pt-16 pb-12 px-4 sm:px-6 lg:px-8 z-10 text-left overflow-hidden">
       <motion.div
         initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 15 }}
         whileInView={{ opacity: 1, y: 0 }}

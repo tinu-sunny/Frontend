@@ -14,10 +14,12 @@ import { Contact } from './sections/Contact';
 import { Footer } from './components/Footer';
 import { ProjectModal } from './components/ProjectModal';
 import { ResumeModal } from './components/ResumeModal';
+import { TinuAILauncher, TinuAIChatModal } from './components/TinuAI';
 
 export function App() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [resumeOpen, setResumeOpen] = useState(false);
+  const [aiChatOpen, setAiChatOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
@@ -104,6 +106,19 @@ export function App() {
           <ResumeModal onClose={() => setResumeOpen(false)} />
         )}
       </AnimatePresence>
+
+      {/* Tinu AI Standalone Assistant (Phase 1 & 1.7) */}
+      <TinuAILauncher
+        isOpen={aiChatOpen}
+        isModalOpen={Boolean(selectedProject || resumeOpen)}
+        onToggle={() => setAiChatOpen((prev) => !prev)}
+      />
+      <TinuAIChatModal
+        isOpen={aiChatOpen}
+        onClose={() => setAiChatOpen(false)}
+        onOpenResume={() => setResumeOpen(true)}
+        onSelectProject={(project) => setSelectedProject(project)}
+      />
     </div>
   );
 }
