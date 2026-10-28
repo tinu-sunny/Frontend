@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Navbar } from './components/Navbar';
 
-import { LoadingIntro } from './components/LoadingIntro';
 import { Hero } from './sections/Hero';
 import { About } from './sections/About';
 import { Skills } from './sections/Skills';
@@ -46,8 +45,6 @@ export function App() {
         ></div>
       </div>
 
-      {/* Cinematic Intro (Optional / dismissible) */}
-      <LoadingIntro />
 
       {/* Sticky Header Navbar */}
       <Navbar onOpenResume={() => setResumeOpen(true)} />
