@@ -8,11 +8,16 @@ import {
   Sparkles, 
   CheckCircle2, 
   AlertCircle,
-  FileDown
+  FileDown,
+  Loader2
 } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 import { GithubIcon, LinkedinIcon, InstagramIcon, TwitterIcon } from '../components/SocialIcons';
 import { profile } from '../data/profile';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+
+const RATE_LIMIT_SECONDS = 60;
+const LAST_SUBMIT_KEY = 'tinu_portfolio_last_contact_time';
 
 export const Contact = ({ onOpenResume }) => {
   const [formData, setFormData] = useState({
@@ -21,44 +26,143 @@ export const Contact = ({ onOpenResume }) => {
     subject: '',
     message: '',
   });
-
+  const [honeypot, setHoneypot] = useState('');
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
+  const recipientEmail = import.meta.env.VITE_EMAILJS_TO_EMAIL || profile.email;
+
   const validate = () => {
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Please provide your name.';
+
+    // Validate Name
+    if (!formData.name.trim()) {
+      newErrors.name = 'Please provide your name.';
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = 'Name must be at least 2 characters.';
+    } else if (formData.name.trim().length > 100) {
+      newErrors.name = 'Name must be less than 100 characters.';
+    }
+
+    // Validate Email
     if (!formData.email.trim()) {
       newErrors.email = 'Email address is required.';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
       newErrors.email = 'Please provide a valid email address.';
     }
+
+    // Validate Subject
+    if (!formData.subject.trim()) {
+      newErrors.subject = 'Please provide a subject.';
+    } else if (formData.subject.trim().length < 3) {
+      newErrors.subject = 'Subject must be at least 3 characters.';
+    } else if (formData.subject.trim().length > 150) {
+      newErrors.subject = 'Subject must be less than 150 characters.';
+    }
+
+    // Validate Message
     if (!formData.message.trim()) {
       newErrors.message = 'Please enter a message.';
     } else if (formData.message.trim().length < 10) {
       newErrors.message = 'Message must be at least 10 characters.';
+    } else if (formData.message.trim().length > 3000) {
+      newErrors.message = 'Message must be under 3,000 characters.';
     }
+
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Prevent duplicate submissions while in progress
+    if (submitting) return;
+
+    // Client-side spam protection: check hidden honeypot trap
+    if (honeypot.trim()) {
+      // Silently absorb spam submissions without consuming API quota
+      setSubmitting(true);
+      setTimeout(() => {
+        setSubmitting(false);
+        setSubmitted(true);
+      }, 500);
+      return;
+    }
+
+    // Validate all form fields
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
 
+    // Rate limiting check
+    const lastSubmitTime = Number(localStorage.getItem(LAST_SUBMIT_KEY) || 0);
+    const now = Date.now();
+    const elapsedSeconds = Math.floor((now - lastSubmitTime) / 1000);
+    if (elapsedSeconds < RATE_LIMIT_SECONDS) {
+      const waitTime = RATE_LIMIT_SECONDS - elapsedSeconds;
+      setErrors({
+        general: `Transmission cooldown active. Please wait ${waitTime}s before transmitting another message.`
+      });
+      return;
+    }
+
+    // Read environment variables
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+    if (!serviceId || !templateId || !publicKey) {
+      setErrors({
+        general: `EmailJS environment configuration is missing (VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, or VITE_EMAILJS_PUBLIC_KEY). Please set up your .env file or contact directly via ${recipientEmail}.`
+      });
+      return;
+    }
+
     setErrors({});
     setSubmitting(true);
 
-    // Verified client-side validation state
-    setTimeout(() => {
+    try {
+      const templateParams = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        from_name: formData.name.trim(),
+        from_email: formData.email.trim(),
+        reply_to: formData.email.trim(),
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
+        to_name: profile.name,
+        to_email: recipientEmail,
+      };
+
+      const response = await emailjs.send(
+        serviceId,
+        templateId,
+        templateParams,
+        publicKey
+      );
+
+      if (response.status === 200 || response.text === 'OK') {
+        localStorage.setItem(LAST_SUBMIT_KEY, Date.now().toString());
+        setSubmitted(true);
+      } else {
+        throw new Error(`Email delivery returned status ${response.status}: ${response.text}`);
+      }
+    } catch (err) {
+      console.error('EmailJS transmission error:', err);
+      const errorMessage =
+        err?.text ||
+        err?.message ||
+        'Failed to deliver transmission. Please verify your internet connection or email directly.';
+      setErrors({
+        general: errorMessage
+      });
+    } finally {
       setSubmitting(false);
-      setSubmitted(true);
-    }, 800);
+    }
   };
 
   return (
@@ -235,15 +339,16 @@ export const Contact = ({ onOpenResume }) => {
                     <CheckCircle2 className="w-8 h-8" />
                   </div>
                   <h4 className="font-heading text-xl font-bold text-white">
-                    Transmission Validated!
+                    Transmission Dispatched!
                   </h4>
                   <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-                    Thank you, <strong className="text-cyan-300">{formData.name}</strong>. Your message details have been validated client-side. You can also reach me directly at <a href={`mailto:${profile.email}`} className="text-cyan-400 underline font-mono">{profile.email}</a>.
+                    Thank you, <strong className="text-cyan-300">{formData.name}</strong>. Your transmission has been successfully delivered to <span className="text-cyan-400 font-mono">{recipientEmail}</span>. I will review and reply to <span className="text-cyan-400 font-mono">{formData.email}</span> promptly.
                   </p>
                   <button
                     onClick={() => {
                       setSubmitted(false);
                       setFormData({ name: '', email: '', subject: '', message: '' });
+                      setErrors({});
                     }}
                     className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider bg-cyan-400 text-black font-bold hover:bg-cyan-300 transition-all cursor-pointer"
                   >
@@ -251,7 +356,21 @@ export const Contact = ({ onOpenResume }) => {
                   </button>
                 </motion.div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+                  {/* Anti-spam Honeypot (invisible to legitimate users) */}
+                  <div className="hidden" aria-hidden="true">
+                    <label htmlFor="company_code_hp">Leave this empty</label>
+                    <input
+                      id="company_code_hp"
+                      type="text"
+                      name="company_code_hp"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                    />
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
                       <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5">
@@ -302,15 +421,25 @@ export const Contact = ({ onOpenResume }) => {
 
                   <div>
                     <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5">
-                      Subject
+                      Subject *
                     </label>
                     <input
                       type="text"
                       placeholder="Project collaboration / Inquiry"
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      className="w-full bg-slate-900/80 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:shadow-[0_0_15px_rgba(0,240,255,0.2)] transition-all"
+                      className={`w-full bg-slate-900/80 border rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none transition-all ${
+                        errors.subject
+                          ? 'border-rose-500 focus:border-rose-400'
+                          : 'border-slate-800 focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(0,240,255,0.2)]'
+                      }`}
                     />
+                    {errors.subject && (
+                      <span className="text-[11px] text-rose-400 font-mono flex items-center gap-1 mt-1">
+                        <AlertCircle className="w-3 h-3" />
+                        {errors.subject}
+                      </span>
+                    )}
                   </div>
 
                   <div>
@@ -336,15 +465,32 @@ export const Contact = ({ onOpenResume }) => {
                     )}
                   </div>
 
+                  {errors.general && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 text-xs font-mono flex items-start gap-3"
+                    >
+                      <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <p className="font-semibold text-rose-200">Transmission Anomaly</p>
+                        <p className="leading-relaxed">{errors.general}</p>
+                      </div>
+                    </motion.div>
+                  )}
+
                   <motion.button
                     whileHover={{ scale: shouldReduceMotion ? 1 : 1.02 }}
                     whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
                     type="submit"
                     disabled={submitting}
-                    className="w-full inline-flex items-center justify-center gap-2 py-4 rounded-xl font-heading text-sm font-bold tracking-widest uppercase text-black bg-cyan-400 hover:bg-cyan-300 transition-all duration-300 shadow-[0_0_20px_rgba(0,240,255,0.5)] hover:shadow-[0_0_30px_rgba(0,240,255,0.8)] disabled:opacity-50 cursor-pointer"
+                    className="w-full inline-flex items-center justify-center gap-2 py-4 rounded-xl font-heading text-sm font-bold tracking-widest uppercase text-black bg-cyan-400 hover:bg-cyan-300 transition-all duration-300 shadow-[0_0_20px_rgba(0,240,255,0.5)] hover:shadow-[0_0_30px_rgba(0,240,255,0.8)] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   >
                     {submitting ? (
-                      <span>Validating Transmission...</span>
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 text-black animate-spin" />
+                        <span>Transmitting Message...</span>
+                      </span>
                     ) : (
                       <>
                         <Send className="w-4 h-4 text-black" />
