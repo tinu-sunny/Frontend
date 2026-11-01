@@ -113,7 +113,7 @@ export const useRobotMovement = ({ isChatOpen, isModalOpen = false }) => {
 
       // Add footstep particle at departure position
       if (!shouldReduceMotion) {
-        const stepId = `step-${Date.now()}`;
+        const stepId = `step-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
         setFootsteps((prev) => [
           ...prev.slice(-4),
           { id: stepId, x: prevPos.x + 22, y: prevPos.y + 44 }

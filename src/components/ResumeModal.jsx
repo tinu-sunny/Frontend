@@ -3,23 +3,17 @@ import { motion } from 'framer-motion';
 import { 
   X, 
   Download, 
-  GraduationCap, 
-  Briefcase, 
-  Cpu, 
-  FolderGit2, 
-  Award, 
+  FileText,
   Mail, 
   MapPin, 
   Printer 
 } from 'lucide-react';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import { profile } from '../data/profile';
-import { journeyData } from '../data/journey';
 import { skillsData } from '../data/skills';
 import { projectsData } from '../data/projects';
-import { useReducedMotion } from '../hooks/useReducedMotion';
-
 export const ResumeModal = ({ onClose }) => {
-  const [activeTab, setActiveTab] = useState('Overview');
+  const [activeTab, setActiveTab] = useState('CV Document (PDF)');
   const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
@@ -35,6 +29,34 @@ export const ResumeModal = ({ onClose }) => {
   }, [onClose]);
 
   const handlePrint = () => {
+    // If not currently on the PDF tab, switch to it first so the iframe is mounted
+    if (activeTab !== 'CV Document (PDF)') {
+      setActiveTab('CV Document (PDF)');
+      setTimeout(() => {
+        const iframe = document.getElementById('resume-pdf-frame');
+        if (iframe && iframe.contentWindow) {
+          try {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+            return;
+          } catch {
+            window.print();
+          }
+        }
+      }, 300);
+      return;
+    }
+
+    const iframe = document.getElementById('resume-pdf-frame');
+    if (iframe && iframe.contentWindow) {
+      try {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        return;
+      } catch {
+        window.print();
+      }
+    }
     window.print();
   };
 
@@ -78,20 +100,42 @@ export const ResumeModal = ({ onClose }) => {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => setActiveTab(activeTab === 'CV Document (PDF)' ? 'Overview' : 'CV Document (PDF)')}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-heading text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                activeTab === 'CV Document (PDF)'
+                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 shadow-[0_0_15px_rgba(0,240,255,0.2)]'
+                  : 'bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700'
+              }`}
+              title="Toggle CV PDF and interactive overview"
+            >
+              <FileText className="w-4 h-4 text-cyan-400" />
+              <span>{activeTab === 'CV Document (PDF)' ? 'Interactive View' : 'View PDF CV'}</span>
+            </button>
             <button
               onClick={handlePrint}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-heading text-xs font-bold uppercase tracking-wider bg-cyan-400 hover:bg-cyan-300 text-black shadow-[0_0_15px_rgba(0,240,255,0.4)] transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-heading text-xs font-bold uppercase tracking-wider bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer"
+              title="Print CV"
             >
               <Printer className="w-4 h-4" />
-              <span>Print / Save PDF</span>
+              <span>Print</span>
             </button>
+            <a
+              href="/assets/tinu__Sunny.pdf"
+              download="Tinu_Sunny_Resume.pdf"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-heading text-xs font-bold uppercase tracking-wider bg-cyan-400 hover:bg-cyan-300 text-black shadow-[0_0_15px_rgba(0,240,255,0.4)] transition-all cursor-pointer"
+              title="Download Resume PDF"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download CV</span>
+            </a>
           </div>
         </div>
 
         {/* Tab Navigation */}
         <div className="flex flex-wrap items-center gap-2 mb-6 border-b border-slate-800 pb-3">
-          {['Overview', 'Experience', 'Education', 'Skills', 'Projects'].map((tab) => (
+          {['CV Document (PDF)', 'Overview', 'Experience', 'Education', 'Skills', 'Projects'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -107,7 +151,17 @@ export const ResumeModal = ({ onClose }) => {
         </div>
 
         {/* Tab Content Display */}
-        <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-6 text-sm text-slate-300">
+        <div className={`overflow-y-auto pr-2 text-sm text-slate-300 ${activeTab === 'CV Document (PDF)' ? 'h-[65vh] min-h-[480px]' : 'max-h-[60vh] space-y-6'}`}>
+          {activeTab === 'CV Document (PDF)' && (
+            <div className="w-full h-full min-h-[480px] rounded-2xl overflow-hidden border border-cyan-500/30 bg-slate-950 flex flex-col relative shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+              <iframe
+                id="resume-pdf-frame"
+                src="/assets/tinu__Sunny.pdf#toolbar=1&view=FitH"
+                title="Tinu Sunny CV"
+                className="w-full h-full min-h-[480px] border-0 rounded-2xl bg-slate-900"
+              />
+            </div>
+          )}
           {activeTab === 'Overview' && (
             <div className="space-y-6">
               {/* Profile Card */}
