@@ -1,21 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, X, ArrowRight, Compass } from 'lucide-react';
-import { RobotAvatar } from './RobotAvatar';
+import { TinuDigitalClone } from './TinuDigitalClone';
 import { useRobotMovement } from './useRobotMovement';
 import { useProactivePrompt } from './useProactivePrompt';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 
 /**
- * TinuAILauncher: Full Portfolio Robot Companion (Phase 1.7)
- * - Section-aware exploration across all 10 portfolio sections
- * - Fluid walking physics with direction-aware orientation
- * - Non-intrusive safe waypoint pathing
- * - Subtle footstep particle trail
- * - Contextual 30-second proactive assistance bubble
- * - Reduced motion and accessibility compliant
+ * TypewriterMessage: Types out the character's proactive message character-by-character
+ * giving the visual effect that the bot is actively speaking / asking in real-time.
  */
-export const TinuAILauncher = ({ isOpen, onToggle, isModalOpen = false }) => {
+const TypewriterMessage = ({ text = '', onComplete }) => {
+  const [displayedText, setDisplayedText] = useState('');
+
+  useEffect(() => {
+    setDisplayedText('');
+    let idx = 0;
+    const interval = setInterval(() => {
+      idx += 1;
+      setDisplayedText(text.slice(0, idx));
+      if (idx >= text.length) {
+        clearInterval(interval);
+        onComplete?.();
+      }
+    }, 28);
+
+    return () => clearInterval(interval);
+  }, [text, onComplete]);
+
+  return (
+    <span className="relative font-mono text-[11px] sm:text-xs text-white font-medium tracking-wide leading-relaxed">
+      {displayedText}
+      <span className="inline-block w-1.5 h-3.5 ml-1 bg-cyan-400 animate-pulse align-middle shadow-[0_0_8px_#22d3ee]" />
+    </span>
+  );
+};
+
+/**
+ * TinuAILauncher: Polished Digital Clone Companion
+ * 
+ * - Full-height prominent character (140–165px on desktop, 105–120px on mobile).
+ * - Fixed canonical placement docked in the bottom-right corner.
+ * - Dynamic 5s visible / 20s hidden greeting speech bubble beside the character.
+ * - Gentle floating while idle with smooth hover scaling.
+ * - Entire character container is interactive and opens the Tinu AI chat modal.
+ */
+export const TinuAILauncher = ({ isOpen, onToggle, isModalOpen = false, isThinking = false }) => {
   const shouldReduceMotion = useReducedMotion();
   const [isHovered, setIsHovered] = useState(false);
 
@@ -30,14 +60,15 @@ export const TinuAILauncher = ({ isOpen, onToggle, isModalOpen = false }) => {
     footsteps
   } = useRobotMovement({ isChatOpen: isOpen, isModalOpen });
 
-  // 5s visible / 20s hidden proactive prompt cycle hook
-  const { showPrompt, handleAskAI, handleDismiss } = useProactivePrompt({
+  // 5s visible / 18s hidden proactive prompt cycle hook with section-aware inquiries
+  const { showPrompt, promptMessage, handleAskAI, handleDismiss } = useProactivePrompt({
+    activeSectionId,
     isChatOpen: isOpen,
     isModalOpen,
     onOpenChat: () => onToggle(true)
   });
 
-  // Dynamic positioning logic for speech bubble to prevent viewport overflow
+  // Dynamic positioning logic for speech bubble relative to viewport
   const isRightHalf = coords.x > (typeof window !== 'undefined' ? window.innerWidth / 2 : 600);
   const isNearTop = coords.y < 220;
 
@@ -49,12 +80,12 @@ export const TinuAILauncher = ({ isOpen, onToggle, isModalOpen = false }) => {
           <div
             key={step.id}
             style={{ left: step.x, top: step.y }}
-            className="fixed w-2 h-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-400/40 shadow-[0_0_8px_#00f0ff] animate-ping pointer-events-none z-30"
+            className="fixed w-2.5 h-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-400/40 shadow-[0_0_10px_#00f0ff] animate-ping pointer-events-none z-30"
             aria-hidden="true"
           />
         ))}
 
-      {/* --- Robot Companion Master Container --- */}
+      {/* --- Digital Clone Companion Master Container --- */}
       <div
         className="fixed inset-0 pointer-events-none select-none z-40 overflow-hidden font-sans"
         aria-live="polite"
@@ -71,67 +102,75 @@ export const TinuAILauncher = ({ isOpen, onToggle, isModalOpen = false }) => {
           }}
           className="pointer-events-none flex flex-col items-center"
         >
-          {/* --- Compact Proactive Speech Bubble (5s visible / 20s hidden loop) --- */}
+          {/* --- Compact Proactive Speech Bubble (Unique Holographic Glass Hologram with Animated Laser Border & Glow) --- */}
           <AnimatePresence>
             {showPrompt && !isOpen && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: isNearTop ? -8 : 8 }}
+                initial={{ opacity: 0, scale: 0.85, y: isNearTop ? -10 : 10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: isNearTop ? -6 : 6 }}
-                transition={{ duration: shouldReduceMotion ? 0 : 0.22, ease: 'easeOut' }}
+                exit={{ opacity: 0, scale: 0.85, y: isNearTop ? -8 : 8 }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.28, ease: [0.16, 1, 0.3, 1] }}
+                onClick={handleAskAI}
                 className={`pointer-events-auto absolute ${
-                  isNearTop ? 'top-full mt-2.5' : 'bottom-full mb-2.5'
+                  isNearTop ? 'top-full mt-3' : 'bottom-full mb-3'
                 } ${
-                  isRightHalf ? 'right-0' : 'left-0'
-                } w-[240px] sm:w-[255px] max-w-[calc(100vw-36px)] rounded-xl bg-[#030914]/95 border border-cyan-400/45 p-2.5 sm:p-3 shadow-[0_0_20px_rgba(0,240,255,0.28),0_8px_20px_rgba(0,0,0,0.85)] backdrop-blur-xl z-50`}
+                  isRightHalf ? 'right-0 sm:right-1' : 'left-0 sm:left-1'
+                } w-[215px] sm:w-[245px] max-w-[calc(100vw-36px)] rounded-2xl z-50 cursor-pointer group/bubble select-none`}
                 role="status"
                 aria-live="polite"
               >
-                {/* Header: AI badge and dismiss button */}
-                <div className="flex items-center justify-between gap-1.5 mb-1.5">
-                  <div className="flex items-center gap-1.5 text-cyan-300 font-mono text-[10px] font-bold tracking-wider uppercase">
-                    <Sparkles className="w-3 h-3 text-cyan-400" />
-                    <span>Tinu AI</span>
+                {/* Animated Rotating Gradient Border Halo */}
+                <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-300 to-emerald-400 opacity-60 group-hover/bubble:opacity-100 blur-[2px] transition-all duration-300 animate-pulse pointer-events-none" />
+
+                {/* Glassmorphic Cyber Hologram Surface */}
+                <div className="relative rounded-2xl bg-[#040e24]/75 backdrop-blur-md border border-cyan-400/40 px-3.5 py-2.5 shadow-[0_0_20px_rgba(0,240,255,0.25)] group-hover/bubble:shadow-[0_0_30px_rgba(0,240,255,0.45)] group-hover/bubble:border-cyan-300 transition-all duration-300">
+                  {/* Holographic Header: Pulsing Online Beacon & AI Name */}
+                  <div className="flex items-center justify-between gap-1.5 mb-1.5">
+                    <div className="flex items-center gap-1.5 text-cyan-300 font-mono text-[9px] font-bold tracking-widest uppercase">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-80" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-300 shadow-[0_0_8px_#22d3ee]" />
+                      </span>
+                      <span className="px-1.5 py-0.2 rounded text-[8px] bg-cyan-950/80 border border-cyan-400/30 text-cyan-300 font-normal">
+                        Hey MAX Here
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDismiss();
+                      }}
+                      aria-label="Dismiss proactive assistance"
+                      className="text-cyan-400/60 hover:text-white transition-colors p-0.5 rounded cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleDismiss}
-                    aria-label="Dismiss proactive assistance"
-                    className="text-slate-400 hover:text-slate-200 transition-colors p-0.5 rounded cursor-pointer"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
+
+                  {/* Typewriter Animated Speech Dialogue */}
+                  <div className="min-h-[32px] flex items-center mb-1.5">
+                    {shouldReduceMotion ? (
+                      <span className="font-mono text-[11px] sm:text-xs text-white font-medium">
+                        {promptMessage || "Hey! Need any help? 👋"}
+                      </span>
+                    ) : (
+                      <TypewriterMessage text={promptMessage || "Hey! Need any help? 👋"} />
+                    )}
+                  </div>
+
+              
+
+                  {/* Cyber Holographic Pointer Beam Pointing to Character */}
+                  <div
+                    className={`absolute ${
+                      isNearTop ? '-top-1.5 border-l border-t' : '-bottom-1.5 border-r border-b'
+                    } ${
+                      isRightHalf ? 'right-7' : 'left-7'
+                    } w-3 h-3 bg-[#040e24] border-cyan-400/50 transform rotate-45 shadow-[0_0_8px_rgba(0,240,255,0.5)]`}
+                    aria-hidden="true"
+                  />
                 </div>
-
-                {/* Concise message */}
-                <p className="text-[11px] text-slate-200 leading-snug mb-2 font-sans">
-                  Need help exploring my portfolio? 👋
-                </p>
-
-                {/* Compact action row */}
-                <div className="flex items-center justify-end">
-                  <button
-                    type="button"
-                    onClick={handleAskAI}
-                    aria-label="Ask Tinu AI assistant"
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-black font-mono text-[10px] font-bold uppercase tracking-wider transition-all duration-200 shadow-[0_0_10px_rgba(0,240,255,0.35)] cursor-pointer"
-                  >
-                    <span>Ask AI</span>
-                    <ArrowRight className="w-2.5 h-2.5 text-black" />
-                  </button>
-                </div>
-
-                {/* Speech bubble pointer / triangle pointing to the robot */}
-                <div
-                  className={`absolute ${
-                    isNearTop
-                      ? '-top-1.5 border-l border-t'
-                      : '-bottom-1.5 border-r border-b'
-                  } ${
-                    isRightHalf ? 'right-6' : 'left-6'
-                  } w-3 h-3 bg-[#030914] border-cyan-400/45 transform rotate-45`}
-                  aria-hidden="true"
-                />
               </motion.div>
             )}
           </AnimatePresence>
@@ -160,7 +199,7 @@ export const TinuAILauncher = ({ isOpen, onToggle, isModalOpen = false }) => {
             )}
           </AnimatePresence>
 
-          {/* --- Interactive Robot Companion Button --- */}
+          {/* --- Interactive Character Master Button (Entire container is clickable) --- */}
           <motion.button
             type="button"
             onClick={onToggle}
@@ -168,38 +207,39 @@ export const TinuAILauncher = ({ isOpen, onToggle, isModalOpen = false }) => {
             onMouseLeave={() => setIsHovered(false)}
             onFocus={() => setIsHovered(true)}
             onBlur={() => setIsHovered(false)}
-            whileHover={{ scale: shouldReduceMotion ? 1 : 1.08 }}
-            whileTap={{ scale: shouldReduceMotion ? 1 : 0.94 }}
+            whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
+            whileTap={{ scale: shouldReduceMotion ? 1 : 0.95 }}
             aria-label={
               isOpen
                 ? 'Minimize Tinu AI Assistant'
-                : `Tinu AI Companion exploring ${activeSectionName}. Click to chat.`
+                : `Tinu AI Digital Clone exploring ${activeSectionName}. Click to chat.`
             }
             aria-expanded={isOpen}
-            className={`pointer-events-auto relative group flex items-center justify-center p-2 rounded-2xl border transition-all duration-300 shadow-2xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-black ${
-              isOpen
-                ? 'bg-[#040f26]/95 border-cyan-400 shadow-[0_0_30px_rgba(0,240,255,0.5)]'
-                : 'bg-[#030a1c]/90 hover:bg-[#061436] border-cyan-500/50 hover:border-cyan-400 shadow-[0_0_25px_rgba(0,240,255,0.3)] hover:shadow-[0_0_35px_rgba(0,240,255,0.6)]'
-            } backdrop-blur-xl ${shouldReduceMotion ? '' : 'animate-robot-float'}`}
+            className={`pointer-events-auto relative group flex items-center justify-center p-0 bg-transparent border-none shadow-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black ${
+              shouldReduceMotion ? '' : 'animate-robot-float'
+            }`}
           >
             {/* Online green indicator badge */}
-            <span className="absolute -top-1 -right-1 z-10 flex h-3 w-3">
+            <span className="absolute -top-1 -right-1 z-20 flex h-3.5 w-3.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400 border-2 border-black shadow-[0_0_8px_#34d399]" />
+              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-400 border-2 border-black shadow-[0_0_8px_#34d399]" />
             </span>
 
-            {/* Animated Robot Avatar Body with Directional Orientation */}
-            <RobotAvatar
-              size={50}
+            {/* Prominent Digital Clone Avatar Body */}
+            <TinuDigitalClone
               isWalking={isWalking}
               isHappy={isHovered || isOpen || isCelebrating}
+              isGreeting={showPrompt}
+              isThinking={isThinking}
               facingLeft={facingLeft}
+              avatarImage="/assets/tinu_digital_avatar.jpg"
+              modelUrl="/assets/tinu_avatar.glb"
             />
 
             {/* Micro status label below */}
-            <div className="absolute -bottom-2 inset-x-0 flex justify-center">
-              <span className="px-1.5 py-0.2 rounded-full bg-black/90 border border-cyan-500/40 text-[8px] font-mono text-cyan-300 font-bold tracking-widest uppercase">
-                {isOpen ? 'CLOSE' : activeSectionId === 'footer' ? 'DONE' : 'AI'}
+            <div className="absolute -bottom-2 inset-x-0 flex justify-center z-20">
+              <span className="px-2 py-0.5 rounded-full bg-black/90 border border-cyan-500/40 text-[9px] font-mono text-cyan-300 font-bold tracking-widest uppercase shadow-md">
+                {isOpen ? 'CLOSE' : activeSectionId === 'footer' ? 'DONE' : ''}
               </span>
             </div>
           </motion.button>

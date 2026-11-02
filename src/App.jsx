@@ -20,6 +20,7 @@ export function App() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [resumeOpen, setResumeOpen] = useState(false);
   const [aiChatOpen, setAiChatOpen] = useState(false);
+  const [isAiThinking, setIsAiThinking] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
@@ -111,6 +112,7 @@ export function App() {
       <TinuAILauncher
         isOpen={aiChatOpen}
         isModalOpen={Boolean(selectedProject || resumeOpen)}
+        isThinking={isAiThinking}
         onToggle={() => setAiChatOpen((prev) => !prev)}
       />
       <TinuAIChatModal
@@ -118,6 +120,7 @@ export function App() {
         onClose={() => setAiChatOpen(false)}
         onOpenResume={() => setResumeOpen(true)}
         onSelectProject={(project) => setSelectedProject(project)}
+        onThinkingChange={(thinking) => setIsAiThinking(thinking)}
       />
     </div>
   );

@@ -9,7 +9,7 @@ export const useRobotMovement = ({ isChatOpen, isModalOpen = false }) => {
   const [activeSectionId, setActiveSectionId] = useState('hero');
   const [waypointIndex, setWaypointIndex] = useState(0);
 
-  // Viewport-based position coordinates (top-left of the robot element)
+  // Viewport-based position coordinates (top-left of the companion element)
   const [coords, setCoords] = useState({ x: 0, y: 0, isInitial: true });
   const [facingLeft, setFacingLeft] = useState(false);
   const [isWalking, setIsWalking] = useState(false);
@@ -24,7 +24,6 @@ export const useRobotMovement = ({ isChatOpen, isModalOpen = false }) => {
   // 1. Observe all portfolio sections with IntersectionObserver
   useEffect(() => {
     const observerCallback = (entries) => {
-      // Find the entry with highest intersection ratio or intersecting near viewport center
       const visibleEntries = entries.filter((e) => e.isIntersecting);
       if (visibleEntries.length > 0) {
         visibleEntries.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
@@ -54,14 +53,18 @@ export const useRobotMovement = ({ isChatOpen, isModalOpen = false }) => {
   const computeWaypointCoords = useCallback(
     (sectionId, index) => {
       const isMobile = window.innerWidth < 640;
+      const companionWidth = isMobile ? 70 : 88;
+      const companionHeight = isMobile ? 106 : 138;
+
       const sectionEl = document.getElementById(sectionId) || document.getElementById('hero');
+
+      // Canonical Resting Position: Bottom-Right of viewport
+      const restingX = Math.max(16, window.innerWidth - companionWidth - (isMobile ? 12 : 24));
+      const restingY = Math.max(90, window.innerHeight - companionHeight - (isMobile ? 16 : 24));
 
       // Fallback if section element is not found
       if (!sectionEl) {
-        return {
-          x: Math.max(20, window.innerWidth - 85),
-          y: Math.max(88, window.innerHeight - 90)
-        };
+        return { x: restingX, y: restingY };
       }
 
       const rect = sectionEl.getBoundingClientRect();
@@ -74,12 +77,15 @@ export const useRobotMovement = ({ isChatOpen, isModalOpen = false }) => {
       const rawY = rect.top + rect.height * wp.yRatio;
 
       // Safe viewport boundary clamps:
-      // - Top: at least 88px (below the sticky navbar)
-      // - Bottom: at most innerHeight - 85px (above screen edge)
-      // - Left: at least 20px
-      // - Right: at most innerWidth - 85px
-      const clampedX = Math.max(20, Math.min(window.innerWidth - 85, rawX));
-      const clampedY = Math.max(88, Math.min(window.innerHeight - 85, rawY));
+      // - Top: at least 92px (below sticky navbar)
+      // - Bottom: at most innerHeight - companionHeight - 20px (above viewport bottom edge)
+      // - Left: at least 20px (left gutter)
+      // - Right: at most innerWidth - companionWidth - 20px (right gutter)
+      const maxX = Math.max(20, window.innerWidth - companionWidth - (isMobile ? 12 : 24));
+      const maxY = Math.max(92, window.innerHeight - companionHeight - (isMobile ? 16 : 24));
+
+      const clampedX = Math.max(20, Math.min(maxX, rawX));
+      const clampedY = Math.max(92, Math.min(maxY, rawY));
 
       return { x: clampedX, y: clampedY };
     },
@@ -116,7 +122,7 @@ export const useRobotMovement = ({ isChatOpen, isModalOpen = false }) => {
         const stepId = `step-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
         setFootsteps((prev) => [
           ...prev.slice(-4),
-          { id: stepId, x: prevPos.x + 22, y: prevPos.y + 44 }
+          { id: stepId, x: prevPos.x + 35, y: prevPos.y + 110 }
         ]);
         setTimeout(() => {
           setFootsteps((prev) => prev.filter((s) => s.id !== stepId));
@@ -144,7 +150,6 @@ export const useRobotMovement = ({ isChatOpen, isModalOpen = false }) => {
   // 5. Section-change listener: When visitor scrolls into a new section, guide robot
   useEffect(() => {
     clearTimeout(scrollSettleTimerRef.current);
-    // Allow rapid scrolling to settle (180ms) before walking to new section's waypoint
     scrollSettleTimerRef.current = setTimeout(() => {
       moveToWaypoint(activeSectionId, 0);
     }, 180);
@@ -152,11 +157,11 @@ export const useRobotMovement = ({ isChatOpen, isModalOpen = false }) => {
     return () => clearTimeout(scrollSettleTimerRef.current);
   }, [activeSectionId, moveToWaypoint]);
 
-  // 6. Periodic in-section exploration timer (every 6–9 seconds)
+  // 6. Periodic in-section exploration timer
   useEffect(() => {
     if (isChatOpen || isModalOpen || shouldReduceMotion) return;
 
-    const intervalTime = activeSectionId === 'footer' ? 8000 : 6500;
+    const intervalTime = activeSectionId === 'footer' ? 8500 : 7000;
 
     moveCycleTimerRef.current = setInterval(() => {
       if (document.hidden || isChatOpen || isModalOpen) return;
@@ -185,10 +190,17 @@ export const useRobotMovement = ({ isChatOpen, isModalOpen = false }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, [activeSectionId, waypointIndex, computeWaypointCoords]);
 
-  // If chat or modal is open, dock cleanly at safe bottom-right
-  const activePosition = isChatOpen || isModalOpen
-    ? { x: Math.max(20, window.innerWidth - 85), y: Math.max(88, window.innerHeight - 90) }
-    : coords;
+  // Compute docked canonical bottom-right position when modal or chat is active
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+  const companionWidth = isMobile ? 70 : 88;
+  const companionHeight = isMobile ? 106 : 138;
+
+  const dockedPosition = {
+    x: typeof window !== 'undefined' ? Math.max(16, window.innerWidth - companionWidth - (isMobile ? 12 : 24)) : 0,
+    y: typeof window !== 'undefined' ? Math.max(90, window.innerHeight - companionHeight - (isMobile ? 16 : 24)) : 0
+  };
+
+  const activePosition = isChatOpen || isModalOpen ? dockedPosition : coords;
 
   return {
     coords: activePosition,

@@ -16,13 +16,13 @@ import {
 import { generateAIResponse } from '../../utils/aiEngine';
 import { aiKnowledge } from '../../data/aiKnowledge';
 import { AIMessageContent } from './AIMessageContent';
-import { RobotAvatar } from './RobotAvatar';
+import { TinuDigitalClone } from './TinuDigitalClone';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 
 const INITIAL_WELCOME = {
   id: 'welcome',
   sender: 'assistant',
-  text: `Hello! 👋 I'm **Tinu AI**, your standalone portfolio assistant.\n\nI operate **100% locally in your browser** with zero external API calls. Ask me about Tinu's MERN projects, technology stack, internship experience, or availability!`,
+  text: `Hello! 👋 I'm **MAX**, your standalone portfolio assistant.\n\n Ask me about Tinu's MERN projects, technology stack, internship experience, or availability!`,
   actions: [
     { type: 'navigate', label: 'Explore Projects Section', target: 'projects' },
     { type: 'navigate', label: 'View Skills Matrix', target: 'skills' }
@@ -41,7 +41,8 @@ export const TinuAIChatModal = ({
   isOpen,
   onClose,
   onOpenResume,
-  onSelectProject
+  onSelectProject,
+  onThinkingChange
 }) => {
   const [messages, setMessages] = useState([INITIAL_WELCOME]);
   const [inputText, setInputText] = useState('');
@@ -53,13 +54,38 @@ export const TinuAIChatModal = ({
     turnCount: 0
   });
   const messagesEndRef = useRef(null);
+  const scrollContainerRef = useRef(null);
+  const lastUserMessageRef = useRef(null);
   const inputRef = useRef(null);
   const shouldReduceMotion = useReducedMotion();
 
-  // Auto-scroll transcript on new message
+  // Smart auto-scroll:
+  // - When chat first opens with only the default message, keep it scrolled to the very top (scrollTop = 0).
+  // - When user asks a question and AI responds, scroll to the top of the question/answer so the user reads from the beginning.
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) return;
+
+    // Initial welcome state: keep scroll at the very top
+    if (messages.length <= 1 && !isTyping) {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTop = 0;
+      }
+      return;
+    }
+
+    if (isTyping) {
+      // While typing, scroll down so typing indicator is visible
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg && lastMsg.sender === 'assistant' && messages.length > 1) {
+        // Scroll so the prompt or top of the assistant's response is at the top of the viewport
+        if (lastUserMessageRef.current) {
+          lastUserMessageRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   }, [messages, isTyping, isOpen]);
 
@@ -97,6 +123,7 @@ export const TinuAIChatModal = ({
     setMessages((prev) => [...prev, userMessage]);
     setInputText('');
     setIsTyping(true);
+    onThinkingChange?.(true);
 
     // Natural brief local processing delay (350ms) to ensure smooth UX
     setTimeout(() => {
@@ -116,6 +143,7 @@ export const TinuAIChatModal = ({
 
       setMessages((prev) => [...prev, assistantMessage]);
       setIsTyping(false);
+      onThinkingChange?.(false);
     }, 380);
   };
 
@@ -180,23 +208,23 @@ export const TinuAIChatModal = ({
         {/* Futuristic Top Bar / Header (Pinned below navbar) */}
         <div className="shrink-0 relative px-4 py-3.5 border-b border-cyan-500/20 bg-gradient-to-r from-[#051129] via-[#040d21] to-[#030914] flex items-center justify-between select-none">
           <div className="flex items-center gap-2.5">
-            <div className="relative w-9 h-9 rounded-xl bg-cyan-950/80 border border-cyan-400/50 flex items-center justify-center text-cyan-300 shadow-[0_0_15px_rgba(0,240,255,0.3)]">
-              <RobotAvatar size={32} isHappy={true} />
+            <div className="relative w-9 h-9 rounded-xl overflow-hidden bg-cyan-950/80 border border-cyan-400/50 flex items-center justify-center text-cyan-300 shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+              <TinuDigitalClone size={28} isHappy={true} avatarImage="/assets/tinu_digital_avatar.jpg" />
               <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 border border-black animate-pulse" />
             </div>
 
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
                 <span className="font-heading text-xs sm:text-sm font-bold tracking-wider text-white">
-                  TINU AI
+                   MAX HERE
                 </span>
-                <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-md bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-semibold tracking-wider">
-                  COMPANION
-                </span>
+                {/* <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-md bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-semibold tracking-wider">
+                  Assistant
+                </span> */}
               </div>
               <span className="text-[10px] font-mono text-cyan-400/80 tracking-widest uppercase flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#00f0ff]" />
-                Zero API Keys • Offline Ready
+                How can i help You 
               </span>
             </div>
           </div>
@@ -225,17 +253,23 @@ export const TinuAIChatModal = ({
         </div>
 
         {/* Message Transcript Container */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-          {messages.map((msg) => (
-            <motion.div
-              key={msg.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
-              className={`flex flex-col ${
-                msg.sender === 'user' ? 'items-end' : 'items-start'
-              }`}
-            >
+        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+          {messages.map((msg, index) => {
+            const isLatestUserMessage =
+              msg.sender === 'user' &&
+              (index === messages.length - 1 || index === messages.length - 2);
+
+            return (
+              <motion.div
+                key={msg.id}
+                ref={isLatestUserMessage ? lastUserMessageRef : null}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
+                className={`flex flex-col ${
+                  msg.sender === 'user' ? 'items-end' : 'items-start'
+                }`}
+              >
               <div
                 className={`flex gap-2.5 max-w-[88%] ${
                   msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'
@@ -314,7 +348,8 @@ export const TinuAIChatModal = ({
                 {msg.timestamp}
               </span>
             </motion.div>
-          ))}
+            );
+          })}
 
           {/* Typing Indicator */}
           {isTyping && (
