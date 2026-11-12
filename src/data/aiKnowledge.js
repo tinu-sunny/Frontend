@@ -30,7 +30,7 @@ export const aiKnowledge = {
   skills: {
     coreMern: skillsData.coreMern,
     categories: skillsData.categories,
-    summary: "Tinu specializes in the MERN stack (MongoDB, Express.js, React.js, Node.js), along with modern styling frameworks (Tailwind CSS, Material UI) and Python for AI/computer vision scripts."
+    summary: "Tinu specializes in the MERN stack (MongoDB, Express.js, React.js, Node.js), along with modern styling (Tailwind CSS), real-time systems (Socket.IO), and scalable RESTful API architectures."
   },
 
   projects: projectsData,

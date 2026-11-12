@@ -14,7 +14,7 @@ export const skillsData = {
         { name: "JavaScript (ES6+)", level: "Advanced", icon: "Cpu" },
         { name: "Tailwind CSS", level: "Advanced", icon: "Layout" },
         { name: "HTML5 & Modern CSS3", level: "Expert", icon: "Layers" },
-        { name: "Material UI", level: "Intermediate", icon: "Palette" },
+        { name: "React Hooks", level: "Advanced", icon: "Sparkles" },
         { name: "Framer Motion", level: "Intermediate", icon: "Sparkles" },
       ]
     },
@@ -25,29 +25,29 @@ export const skillsData = {
         { name: "Node.js", level: "Advanced", icon: "Server" },
         { name: "Express.js", level: "Advanced", icon: "Terminal" },
         { name: "RESTful API Architecture", level: "Advanced", icon: "Network" },
-        { name: "Authentication (JWT / Sessions)", level: "Intermediate", icon: "ShieldCheck" },
-        { name: "Middleware & Error Handling", level: "Advanced", icon: "Sliders" },
+        { name: "JWT & Role-Based Auth", level: "Advanced", icon: "ShieldCheck" },
+        { name: "Socket.IO (Real-Time)", level: "Intermediate", icon: "Sliders" },
       ]
     },
     {
       id: "databases",
       title: "Database Management",
       skills: [
-        { name: "MongoDB (Mongoose ODM)", level: "Advanced", icon: "Database" },
-        { name: "SQL (PostgreSQL / MySQL)", level: "Intermediate", icon: "HardDrive" },
-        { name: "Schema Modeling & Indexing", level: "Intermediate", icon: "Grid" },
-        { name: "Data Aggregation Pipelines", level: "Intermediate", icon: "GitBranch" },
+        { name: "MongoDB", level: "Advanced", icon: "Database" },
+        { name: "Mongoose ODM", level: "Advanced", icon: "HardDrive" },
+        { name: "Schema Modeling & Indexing", level: "Advanced", icon: "Grid" },
+        { name: "Data Aggregation Pipelines", level: "Advanced", icon: "GitBranch" },
       ]
     },
     {
       id: "tools",
-      title: "Tools & Development",
+      title: "Tools & Deployment",
       skills: [
         { name: "Git & GitHub", level: "Advanced", icon: "GitFork" },
-        { name: "VS Code", level: "Expert", icon: "Code2" },
-        { name: "Vite & Modern Bundlers", level: "Advanced", icon: "Zap" },
-        { name: "npm & Package Management", level: "Advanced", icon: "Package" },
-        { name: "Postman API Testing", level: "Intermediate", icon: "Send" },
+        { name: "Postman API Testing", level: "Advanced", icon: "Send" },
+        { name: "Render & Netlify", level: "Advanced", icon: "Zap" },
+        { name: "VS Code & Vite", level: "Expert", icon: "Code2" },
+        { name: "MVC Architecture", level: "Advanced", icon: "Package" },
       ]
     }
   ]

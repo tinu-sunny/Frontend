@@ -62,23 +62,63 @@ export const projectsData = [
   },
   {
     id: "skillly-platform",
-    title: "Skillly Platform",
-    tagline: "Interactive collaborative learning portal for university students.",
-    category: "Web Apps",
+    title: "Skillly",
+    tagline: "Career guidance and professional networking platform connecting students, counselors, institutions, and companies.",
+    category: "Full Stack",
     featured: true,
-    technologies: ["React", "Tailwind CSS", "Node.js", "Express", "MongoDB"],
-    overview: "A comprehensive e-learning hub where computer science students access curated modules, track course milestones, and collaborate on coding tasks.",
-    problem: "Scattered learning materials across disparate chat groups led to missed deadlines and disorganized student progress.",
-    solution: "Centralized learning roadmaps, interactive quizzes, downloadable notes, and peer study groups into a unified high-performance portal.",
+    technologies: ["React.js", "Node.js", "Express.js", "MongoDB", "Socket.IO", "JWT"],
+    overview: "A scalable full-stack career guidance and professional networking platform designed to support Admin, Students, Counselors, Institutions, and Companies in a unified ecosystem.",
+    problem: "Students and job seekers struggle to find centralized career guidance, counselor bookings, institutional coordination, and verified job postings across fragmented channels.",
+    solution: "Designed and built an end-to-end platform featuring career exploration, counseling booking, real-time chat, AI assistance, payment integration, and robust administration dashboards.",
     contribution: [
-      "Created modular course catalog and chapter progress trackers",
-      "Implemented JWT authentication with role-based access for students and mentors",
-      "Built custom markdown parser for technical course notes",
-      "Designed dark-mode UI optimized for late-night student study sessions"
+      "Designed and developed scalable full-stack platform supporting Admin, Students, Counselors, Institutions, and Companies",
+      "Implemented secure JWT-based authentication, role-based access control, and personalized dashboards",
+      "Built career exploration, counseling booking, real-time chat, AI-assisted tools, and payment integration",
+      "Developed admin dashboards for user management, analytics, job postings, and applications"
     ],
-    github: "https://github.com",
+    github: "https://github.com/tinu-sunny",
     demo: "https://example.com",
-    metrics: "Over 200+ active student test sessions"
+    metrics: "Multi-role architecture supporting 5 user tiers"
+  },
+  {
+    id: "life-drop",
+    title: "Life Drop",
+    tagline: "Blood donor management platform with location-based discovery and verified donor workflows.",
+    category: "Full Stack",
+    featured: true,
+    technologies: ["React.js", "Node.js", "Express.js", "MongoDB"],
+    overview: "A comprehensive digital blood donation coordination platform enabling life-saving donor discovery, verified registrations, and rapid emergency outreach.",
+    problem: "During emergency medical situations, patients and hospitals struggle to quickly locate compatible, verified, and nearby voluntary blood donors.",
+    solution: "Developed a full-stack platform for donor registration, verification, and location-based discovery with administrative approval workflows, advanced filtering, and instant sharing.",
+    contribution: [
+      "Developed full-stack system for donor registration, verification, and location-based discovery",
+      "Implemented secure authentication with admin approval workflows",
+      "Built advanced donor search with filters, PDF export, and WhatsApp sharing",
+      "Ensured strong form validation and data consistency across donor records"
+    ],
+    github: "https://github.com/tinu-sunny",
+    demo: "https://example.com",
+    metrics: "Rapid location-based donor search with WhatsApp sharing"
+  },
+  {
+    id: "book-store",
+    title: "Book Store",
+    tagline: "Buy & sell bookstore web application with role-based access and order management.",
+    category: "Full Stack",
+    featured: true,
+    technologies: ["React.js", "Node.js", "Express.js", "MongoDB"],
+    overview: "A full-stack e-commerce marketplace for buying and selling books with complete inventory control, order management, and secure role-based access.",
+    problem: "Book enthusiasts and local sellers need an easy, accessible online platform to list, purchase, and manage book orders securely.",
+    solution: "Engineered a high-performance full-stack bookstore application featuring protected shopping routes, order processing, and administrative controls.",
+    contribution: [
+      "Built a full-stack bookstore application with user authentication and admin management",
+      "Implemented CRUD operations, order management, and protected routes",
+      "Implemented Role-Based Authentication to protect sensitive administrative endpoints",
+      "Created intuitive book discovery and catalogue browsing interface"
+    ],
+    github: "https://github.com/tinu-sunny",
+    demo: "https://example.com",
+    metrics: "Complete end-to-end CRUD and order tracking workflow"
   },
   {
     id: "salem-marthoma-church",

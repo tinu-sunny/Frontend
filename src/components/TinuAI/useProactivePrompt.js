@@ -29,7 +29,7 @@ export const SECTION_PROMPTS = {
   ],
   journey: [
     "Explore Tinu's milestones & timeline! 📍",
-    "Ask about his Lumina Tech Lab role! 💼",
+    "Ask about his role at Skyniche Technologies! 💼",
     "Curious about his career roadmap? 🗺️"
   ],
   lab: [

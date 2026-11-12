@@ -33,6 +33,7 @@ export const Hero = ({ onExploreWork, onOpenResume }) => {
     { name: 'Express.js', delay: 0.5 },
     { name: 'React.js', delay: 0.6, primary: true },
     { name: 'Node.js', delay: 0.7 },
+    { name: 'SQL', delay: 0.7 },
   ];
 
   return (
@@ -213,7 +214,7 @@ export const Hero = ({ onExploreWork, onOpenResume }) => {
           >
             {/* The generated high-fidelity cinematic portrait */}
             <img
-              src="/assets/tinu_sunny_hero.jpg"
+              src="/assets/tinu_reference_photo.jpg"
               alt="Tinu Sunny - Full-Stack Developer"
               className="w-full h-full object-cover object-top filter brightness-100 contrast-105 group-hover:scale-103 transition-transform duration-700"
             />
@@ -225,9 +226,9 @@ export const Hero = ({ onExploreWork, onOpenResume }) => {
             {/* Cyan bottom badge */}
             <div className="absolute bottom-4 left-4 right-4 bg-slate-950/85 backdrop-blur-md border border-cyan-500/30 rounded-xl px-4 py-2.5 flex items-center justify-between shadow-lg">
               <div className="flex items-center gap-2">
-                <Terminal className="w-4 h-4 text-cyan-400" />
+                {/* <Terminal className="w-4 h-4 text-cyan-400" /> */}
                 <span className="font-mono text-xs font-semibold text-slate-200">
-                  Lumina Tech Lab Intern
+                 ⌁ Developer @ Skyniche Technologies
                 </span>
               </div>
               <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest flex items-center gap-1">

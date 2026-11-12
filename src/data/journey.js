@@ -1,30 +1,30 @@
 export const journeyData = [
   {
-    year: "2024",
-    title: "Completed BSc Computer Science Graduation",
-    subtitle: "University of Kerala",
-    description: "Successfully graduated with a Bachelor's degree in Computer Science. Formed strong algorithmic thinking, database systems proficiency, and software development foundations.",
-    highlight: "Graduated with Computer Science Degree",
+    year: "July 2021 – June 2024",
+    title: "Bachelor of Science in Computer Science",
+    subtitle: "University Institute of Technology (UIT), Adoor, Pathanamthitta",
+    description: "Successfully completed Bachelor's degree in Computer Science. Formed strong foundations in algorithmic thinking, data structures, database management, and object-oriented programming.",
+    highlight: "BSc in Computer Science (UIT Adoor)",
     status: "Completed",
     skills: ["Data Structures", "Algorithms", "C++", "Java", "SQL", "Web Basics"]
   },
   {
-    year: "2025",
-    title: "Advanced MERN Stack Mastery",
-    subtitle: "Independent & Collaborative Builds",
-    description: "Deepened practical skills across modern frontend and backend architectures. Developed end-to-end full stack web platforms including Smart Salary Tracker and SnapHunt.",
-    highlight: "Full-Stack Web Architectures",
+    year: "July 2025 – Present",
+    title: "Full Stack Developer (MEAN) Internship",
+    subtitle: "Remote",
+    description: "Developed and optimized RESTful APIs using Node.js and Express.js. Implemented JWT-based authentication and role-based access control. Optimized MongoDB queries, indexes, and aggregation pipelines. Integrated real-time notifications and live updates using Socket.IO, following clean MVC architecture.",
+    highlight: "Backend & Full-Stack Remote Internship",
     status: "Completed",
-    skills: ["React.js", "Node.js", "Express", "MongoDB", "Tailwind CSS", "REST APIs"]
+    skills: ["Node.js", "Express.js", "MongoDB", "JWT", "Socket.IO", "REST APIs", "MVC Architecture"]
   },
   {
-    year: "July 2025 – Present",
-    title: "Full-Stack Development Intern",
-    subtitle: "Lumina Technology Lab",
-    description: "Working actively on enterprise web applications, building reusable React UI components, integrating complex RESTful endpoints, and participating in code reviews and agile sprints.",
-    highlight: "Active Industry Internship",
+    year: "Present",
+    title: "Full-Stack Developer",
+    subtitle: "Skyniche Technologies",
+    description: "Active full-stack development building scalable web applications with modern JavaScript frameworks, performant backend micro-architectures, and high-concurrency database systems.",
+    highlight: "Active Role at Skyniche Technologies",
     status: "Current",
-    skills: ["Production React", "Express APIs", "MongoDB Schemas", "Git Workflows", "Team Agile"]
+    skills: ["React.js", "Node.js", "Express.js", "MongoDB", "Tailwind CSS", "Enterprise Web Apps"]
   },
   {
     year: "Future Horizon",
