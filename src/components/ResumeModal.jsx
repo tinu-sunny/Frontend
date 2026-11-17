@@ -218,50 +218,114 @@ export const ResumeModal = ({ onClose }) => {
 
           {activeTab === 'Experience' && (
             <div className="space-y-4">
-              <div className="p-5 rounded-2xl bg-slate-900/60 border border-cyan-500/20">
-                <div className="flex items-center justify-between mb-1">
-                  <h4 className="font-heading text-base font-bold text-white">
-                    {profile.currentRole.title}
-                  </h4>
-                  <span className="text-xs font-mono text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-500/30">
-                    {profile.currentRole.period}
-                  </span>
-                </div>
-                <p className="text-xs font-mono text-slate-400 mb-3">
-                  {profile.currentRole.company}
-                </p>
-                <p className="text-xs text-slate-300 leading-relaxed mb-4">
-                  {profile.currentRole.description}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {['React.js', 'Node.js', 'Express', 'MongoDB', 'Tailwind CSS', 'REST APIs', 'Git Workflows'].map((t) => (
-                    <span key={t} className="text-[10px] font-mono bg-slate-950 text-cyan-300 px-2 py-0.5 rounded border border-slate-800">
-                      {t}
+              {(profile.experienceList || [profile.currentRole]).map((exp, eIdx) => (
+                <div
+                  key={eIdx}
+                  className={`p-5 rounded-2xl bg-slate-900/60 border transition-all ${
+                    exp.isCurrent
+                      ? 'border-cyan-400/50 shadow-[0_0_20px_rgba(0,240,255,0.15)] bg-slate-900/80'
+                      : 'border-cyan-500/20'
+                  }`}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-heading text-base font-bold text-white">
+                        {exp.position || exp.title}
+                      </h4>
+                      {exp.isCurrent && (
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                          Active
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs font-mono text-cyan-400 bg-cyan-950 px-2.5 py-0.5 rounded border border-cyan-500/30">
+                      {exp.duration || exp.period}
                     </span>
-                  ))}
+                  </div>
+
+                  <p className="text-xs font-mono text-cyan-300 font-semibold mb-1">
+                    {exp.company}
+                    {exp.location && (
+                      <span className="text-slate-400 font-normal ml-2">
+                        • {exp.location}
+                      </span>
+                    )}
+                    {exp.employmentType && (
+                      <span className="text-slate-500 font-normal ml-2">
+                        ({exp.employmentType})
+                      </span>
+                    )}
+                  </p>
+
+                  {/* Bullet points or string description */}
+                  {Array.isArray(exp.description) ? (
+                    <ul className="text-xs text-slate-300 leading-relaxed mb-3 space-y-1 list-disc list-inside">
+                      {exp.description.map((item, dIdx) => (
+                        <li key={dIdx} className="text-slate-300">
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-xs text-slate-300 leading-relaxed mb-3">
+                      {exp.description}
+                    </p>
+                  )}
+
+                  {/* Tech badges */}
+                  {exp.technologies && exp.technologies.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-800">
+                      {exp.technologies.map((t) => (
+                        <span
+                          key={t}
+                          className="text-[10px] font-mono bg-slate-950 text-cyan-300 px-2 py-0.5 rounded border border-slate-800/80"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </div>
+              ))}
             </div>
           )}
 
           {activeTab === 'Education' && (
             <div className="space-y-4">
-              <div className="p-5 rounded-2xl bg-slate-900/60 border border-cyan-500/20">
-                <div className="flex items-center justify-between mb-1">
-                  <h4 className="font-heading text-base font-bold text-white">
-                    {profile.education.degree}
-                  </h4>
-                  <span className="text-xs font-mono text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-500/30">
-                    Graduated {profile.education.graduationYear}
-                  </span>
+              {(profile.educationList || [profile.education]).map((edu, edIdx) => (
+                <div
+                  key={edIdx}
+                  className="p-5 rounded-2xl bg-slate-900/60 border border-cyan-500/20 hover:border-cyan-400/40 transition-all"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+                    <h4 className="font-heading text-base font-bold text-white">
+                      {edu.degree}
+                    </h4>
+                    <span className="text-xs font-mono text-cyan-400 bg-cyan-950 px-2.5 py-0.5 rounded border border-cyan-500/30">
+                      {edu.passout ? `Completed ${edu.passout}` : edu.graduationYear ? `Graduated ${edu.graduationYear}` : edu.period}
+                    </span>
+                  </div>
+
+                  <p className="text-xs font-mono text-slate-300 font-medium mb-1">
+                    {edu.institution}
+                    {edu.location && (
+                      <span className="text-slate-500 font-normal ml-2">
+                        • {edu.location}
+                      </span>
+                    )}
+                  </p>
+
+                  {edu.fieldOfStudy && (
+                    <p className="text-[11px] font-mono text-cyan-400/80 mb-2">
+                      Field: <strong className="text-slate-200">{edu.fieldOfStudy}</strong>
+                    </p>
+                  )}
+
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    {edu.description}
+                  </p>
                 </div>
-                <p className="text-xs font-mono text-slate-400 mb-2">
-                  {profile.education.institution}
-                </p>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  {profile.education.description}
-                </p>
-              </div>
+              ))}
             </div>
           )}
 

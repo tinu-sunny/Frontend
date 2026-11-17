@@ -24,6 +24,8 @@ export const aiKnowledge = {
     socials: profile.socials,
     currentRole: profile.currentRole,
     education: profile.education,
+    educationList: profile.educationList,
+    experienceList: profile.experienceList,
     availability: "Available for full-time Full-Stack Developer roles, high-impact internships, and freelance engineering collaborations."
   },
 

@@ -298,7 +298,11 @@ export const Skills = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.15 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+          className={
+            filteredCategories.length === 1
+              ? "max-w-2xl mx-auto w-full"
+              : "grid grid-cols-1 md:grid-cols-2 gap-8"
+          }
         >
           {filteredCategories.map((cat) => (
             <motion.div

@@ -79,7 +79,7 @@ export function App() {
         <LearningLab />
 
         {/* Section 9: Achievements & Certifications */}
-        <Achievements />
+        {/* <Achievements /> */}
 
         {/* Section 10: Tech Journal */}
         <Blog />
